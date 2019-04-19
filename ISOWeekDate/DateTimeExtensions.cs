@@ -1,0 +1,47 @@
+﻿using System;
+using System.Globalization;
+
+namespace ISOWeekDate
+{
+	public static class DateTimeExtensions
+	{
+		public static int GetISOWeekDateDay(this DateTime dateTime)
+		{
+			if (dateTime.DayOfWeek == DayOfWeek.Sunday)
+			{
+				return 7;
+			}
+			else
+			{
+				return (int)dateTime.DayOfWeek;
+			}
+		}
+
+		public static int GetISOWeekDateWeek(this DateTime dateTime)
+		{
+			// Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
+			// be the same week# as whatever Thursday, Friday or Saturday are,
+			// and we always get those right
+			DayOfWeek day = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(dateTime);
+			if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
+			{
+				dateTime = dateTime.AddDays(3);
+			}
+
+			// Return the week of our adjusted day
+			return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+		}
+
+		public static int GetISOWeekDateYear(this DateTime dateTime)
+		{
+			if (dateTime.Month == 1 && dateTime.GetISOWeekDateWeek() == 53)
+			{
+				return dateTime.Year - 1;
+			}
+			else
+			{
+				return dateTime.Year;
+			}
+		}
+	}
+}
