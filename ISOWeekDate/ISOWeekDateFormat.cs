@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ISOWeekDate.Extensions;
+using System;
 using System.Globalization;
 
 namespace ISOWeekDate
@@ -41,19 +42,19 @@ namespace ISOWeekDate
 
 			if (format == ShortCompactPatternSpecifier)
 			{
-				return string.Format("{0,4}W{1,2}", date.GetISOWeekDateYear(), date.GetISOWeekDateWeek());
+				return string.Format("{0,4}W{1,2}", date.GetISOWeekDateYear(), date.GetWeekNumber());
 			}
 			else if (format == ShortExtendedPatternSpecifier)
 			{
-				return string.Format("{0,4}-W{1,2}", date.GetISOWeekDateYear(), date.GetISOWeekDateWeek());
+				return string.Format("{0,4}-W{1,2}", date.GetISOWeekDateYear(), date.GetWeekNumber());
 			}
 			else if (format == FullCompactPatternSpecifier)
 			{
-				return string.Format("{0,4}W{1,2}{2,1}", date.GetISOWeekDateYear(), date.GetISOWeekDateWeek(), date.GetISOWeekDateDay());
+				return string.Format("{0,4}W{1,2}{2,1}", date.GetISOWeekDateYear(), date.GetWeekNumber(), date.GetWeekdayNumber());
 			}
 			else if (format == FullExtendedPatternSpecifier)
 			{
-				return string.Format("{0,4}-W{1,2}-{2,1}", date.GetISOWeekDateYear(), date.GetISOWeekDateWeek(), date.GetISOWeekDateDay());
+				return string.Format("{0,4}-W{1,2}-{2,1}", date.GetISOWeekDateYear(), date.GetWeekNumber(), date.GetWeekdayNumber());
 			}
 			else
 			{
