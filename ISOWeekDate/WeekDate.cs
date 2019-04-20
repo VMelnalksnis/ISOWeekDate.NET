@@ -1,5 +1,4 @@
-﻿using ISOWeekDate.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -10,7 +9,7 @@ namespace ISOWeekDate
 	/// Represents an ISO 8601 week date.
 	/// </summary>
 	/// <seealso cref="https://en.wikipedia.org/wiki/Week_date"/>
-	public class WeekDate : IFormattable, IEquatable<WeekDate>
+	public class WeekDate : IFormattable, IEquatable<WeekDate>, IComparable, IComparable<WeekDate>
 	{
 		#region Fields
 		private const int minimumYear = 1;
@@ -119,45 +118,20 @@ namespace ISOWeekDate
 		#region Methods
 		public DateTime GetDateTime()
 		{
-			throw new NotImplementedException();
+			var ordinalDay = Week * 7 + Weekday - (GetJanuaryFourthWeekday(this) + 3);
 
-			var year = Year;
-
-			var ordinal = Week * 7 + Weekday - (GetJanuaryFourthWeekday(this) + 3);
-
-			if (ordinal < 1)
-			{
-				ordinal += CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year - 1);
-				year--;
-			}
-			else if (ordinal > CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year))
-			{
-				ordinal -= CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year) + 1;
-				year++;
-			}
-
-			var month = (int)Math.Floor(ordinal / 30m) + 1;
-
-			var day = ordinal - 30 * (month - 1) + ((CultureInfo.CurrentCulture.Calendar.IsLeapYear(Year)) ? 2 : 3) - (int)Math.Floor(0.6m * (month + 1));
-
-			if(day < 1)
-			{
-				day += CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(Year, month - 1);
-				month--;
-			}
-
-			return new DateTime(year, month, day);
+			return new DateTime(Year, 1, 1).AddDays(ordinalDay - 1);
 		}
 
 		public int GetOrdinal()
 		{
 			var ordinal = Week * 7 + Weekday - (GetJanuaryFourthWeekday(this) + 3);
 
-			if(ordinal < 1)
+			if (ordinal < 1)
 			{
 				ordinal += CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year - 1);
 			}
-			else if(ordinal > CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year))
+			else if (ordinal > CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year))
 			{
 				ordinal -= CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year);
 			}
@@ -182,13 +156,13 @@ namespace ISOWeekDate
 		public static int GetWeekCountInYear(int year) => 52 + ((P(year) == 4 || P(year - 1) == 3) ? 1 : 0);
 
 		/// <summary>
-		/// Gets the ordinal day number in the week of <paramref name="dayOfWeek"/>.
+		/// Gets the <see cref="WeekDate"/> ordinal day number of the specified <see cref="DayOfWeek"/>.
 		/// </summary>
 		/// 
-		/// <param name="dayOfWeek"></param>
+		/// <param name="dayOfWeek">The <see cref="DayOfWeek"/> to read.</param>
 		/// 
 		/// <returns>
-		/// A digit from 1 through 7, beginning with Monday and ending with Sunday.
+		/// A integer from 1 through 7, beginning with Monday and ending with Sunday.
 		/// </returns>
 		/// 
 		/// <exception cref="ArgumentOutOfRangeException">
@@ -221,13 +195,13 @@ namespace ISOWeekDate
 		}
 
 		/// <summary>
-		/// Gets the week number of <paramref name="dateTime"/>.
+		/// Gets the <see cref="WeekDate"/> week of the specified <see cref="DateTime"/>.
 		/// </summary>
 		/// 
-		/// <param name="dateTime"></param>
+		/// <param name="dateTime">The <see cref="DateTime"/> to read.</param>
 		/// 
 		/// <returns>
-		/// 
+		/// An integer that represents the week date week in <paramref name="dateTime"/>.
 		/// </returns>
 		public static int GetWeekNumber(DateTime dateTime)
 		{
@@ -244,9 +218,19 @@ namespace ISOWeekDate
 			return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(dateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 		}
 
+		/// <summary>
+		/// Gets the <see cref="WeekDate"/> year of the specified <see cref="DateTime"/>.
+		/// </summary>
+		/// 
+		/// <param name="dateTime">The <see cref="DateTime"/> to read.</param>
+		/// 
+		/// <returns>
+		/// An integer that represents the week date year in <paramref name="dateTime"/>.
+		/// </returns>
 		public static int GetYear(DateTime dateTime)
 		{
-			return dateTime.Year - ((dateTime.Month == 1 && dateTime.GetWeekNumber() == 53) ? 1 : 0);
+			// The year of a week is equal to whatever the date is of the thursday of that week
+			return dateTime.AddDays(4 - GetWeekdayNumber(dateTime.DayOfWeek)).Year;
 		}
 		#endregion
 
@@ -275,21 +259,17 @@ namespace ISOWeekDate
 
 			return builder.ToString();
 		}
+
+		public override string ToString()
+		{
+			return ToString(_formats["D"]);
+		}
 		#endregion
 
 		#region IEquatable<WeekDate>
-		public override bool Equals(object obj)
-		{
-			return Equals(obj as WeekDate);
-		}
+		public override bool Equals(object obj) => Equals(obj as WeekDate);
 
-		public bool Equals(WeekDate other)
-		{
-			return other != null &&
-				   Weekday == other.Weekday &&
-				   Week == other.Week &&
-				   Year == other.Year;
-		}
+		public bool Equals(WeekDate other) => CompareTo(other) == 0;
 
 		public override int GetHashCode()
 		{
@@ -300,15 +280,53 @@ namespace ISOWeekDate
 			return hashCode;
 		}
 
-		public static bool operator ==(WeekDate date1, WeekDate date2)
+		public static bool operator ==(WeekDate date1, WeekDate date2) => EqualityComparer<WeekDate>.Default.Equals(date1, date2);
+
+		public static bool operator !=(WeekDate date1, WeekDate date2) => !(date1 == date2);
+		#endregion
+
+		#region IComparable
+		public int CompareTo(object obj)
 		{
-			return EqualityComparer<WeekDate>.Default.Equals(date1, date2);
+			if (obj == null)
+			{
+				return 1;
+			}
+
+			switch (obj)
+			{
+				case WeekDate otherWeekDate:
+					return CompareTo(otherWeekDate);
+				default:
+					throw new ArgumentException($"Object is not a {typeof(WeekDate)}", nameof(obj));
+			}
 		}
 
-		public static bool operator !=(WeekDate date1, WeekDate date2)
+		public int CompareTo(WeekDate other)
 		{
-			return !(date1 == date2);
+			if (other == null)
+			{
+				return 1;
+			}
+
+			if (Year.CompareTo(other.Year) != 0)
+			{
+				return Year.CompareTo(other.Year);
+			}
+			else if (Week.CompareTo(other.Week) != 0)
+			{
+				return Week.CompareTo(other.Week);
+			}
+			else
+			{
+				return Weekday.CompareTo(other.Weekday);
+			}
 		}
+
+		public static bool operator <(WeekDate date1, WeekDate date2) => date1.CompareTo(date2) < 0;
+		public static bool operator >(WeekDate date1, WeekDate date2) => date1.CompareTo(date2) > 0;
+		public static bool operator <=(WeekDate date1, WeekDate date2) => date1.CompareTo(date2) <= 0;
+		public static bool operator >=(WeekDate date1, WeekDate date2) => date1.CompareTo(date2) >= 0;
 		#endregion
 	}
 }

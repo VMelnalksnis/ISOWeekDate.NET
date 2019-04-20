@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISOWeekDate", "ISOWeekDate\ISOWeekDate.csproj", "{BBDEF269-23D8-4B6A-9EF2-63442D1979BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISOWeekDateTests", "ISOWeekDateTestsCore\ISOWeekDateTests.csproj", "{F0855EDE-2EDF-4ED1-A778-AECF04337EFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISOWeekDateTests", "ISOWeekDateTests\ISOWeekDateTests.csproj", "{F0855EDE-2EDF-4ED1-A778-AECF04337EFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

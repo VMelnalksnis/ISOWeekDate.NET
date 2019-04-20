@@ -7,18 +7,21 @@ namespace ISOWeekDate.Extensions
 	public class DateTimeExtensionsTests
 	{
 		[TestMethod()]
+		[TestCategory("Not Implemented")]
 		public void GetISOWeekDateDayTest()
 		{
 			throw new NotImplementedException();
 		}
 
 		[TestMethod()]
+		[TestCategory("Not Implemented")]
 		public void GetISOWeekDateWeekTest()
 		{
 			throw new NotImplementedException();
 		}
 
 		[TestMethod()]
+		[TestCategory("Not Implemented")]
 		public void GetISOWeekDateYearTest()
 		{
 			throw new NotImplementedException();
