@@ -19,16 +19,16 @@ namespace ISOWeekDate
 		private const int minimumDay = 1;
 		private const int maximumDay = 7;
 
-		private const string _completeBasicFormatSpecifier = "1";
+		private const string _completeBasicFormatSpecifier = "d";
 		private const string _completeBasicFormat = "YYYYWwwD";
 
-		private const string _completeExtendedFormatSpecifier = "2";
+		private const string _completeExtendedFormatSpecifier = "D";
 		private const string _completeExtendedFormat = "YYYY-Www-D";
 
-		private const string _reducedBasicFormatSpecifier = "3";
+		private const string _reducedBasicFormatSpecifier = "y";
 		private const string _reducedBasicFormat = "YYYYWww";
 
-		private const string _reducedExtendedFormatSpecifier = "4";
+		private const string _reducedExtendedFormatSpecifier = "Y";
 		private const string _reducedExtendedFormat = "YYYY-Www";
 
 		private static readonly Dictionary<string, string> _formats = new Dictionary<string, string>()
@@ -67,23 +67,24 @@ namespace ISOWeekDate
 
 		#region Constructors
 		/// <summary>
-		/// Initializes a new instance of the <see cref="WeekDate"/> class to a specified <see cref="DateTime"/>.
+		/// Initializes a new instance of the <see cref="WeekDate"/> class to a specified date.
 		/// </summary>
-		/// <param name="date"></param>
+		/// 
+		/// <param name="date">The date.</param>
 		public WeekDate(DateTime date)
 		{
-			Weekday = date.GetWeekdayNumber();
-			Week = date.GetWeekNumber();
-			Year = date.GetISOWeekDateYear();
+			Weekday = GetWeekdayNumber(date.DayOfWeek);
+			Week = GetWeekNumber(date);
+			Year = GetYear(date);
 		}
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of <see cref="WeekDate"/> class to the specified year, week and day.
 		/// </summary>
 		/// 
-		/// <param name="year"></param>
-		/// <param name="week"></param>
-		/// <param name="weekday"></param>
+		/// <param name="year">The year (1 through 9999)>.</param>
+		/// <param name="week">The week (1 through the number of weeks in <paramref name="year"/>).</param>
+		/// <param name="weekday">The day (1 through 7).</param>
 		/// 
 		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="year"/> is less than 1 or greater than 9999.
@@ -116,9 +117,69 @@ namespace ISOWeekDate
 		#endregion
 
 		#region Methods
-		private static int P(int year) => (year + (year / 4) - (year / 100) + (year / 400)) % 7;
+		public DateTime GetDateTime()
+		{
+			throw new NotImplementedException();
 
-		private static int GetWeekCountInYear(int year) => 52 + ((P(year) == 4 || P(year - 1) == 3) ? 1 : 0);
+			var year = Year;
+
+			var ordinal = Week * 7 + Weekday - (GetJanuaryFourthWeekday(this) + 3);
+
+			if (ordinal < 1)
+			{
+				ordinal += CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year - 1);
+				year--;
+			}
+			else if (ordinal > CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year))
+			{
+				ordinal -= CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year) + 1;
+				year++;
+			}
+
+			var month = (int)Math.Floor(ordinal / 30m) + 1;
+
+			var day = ordinal - 30 * (month - 1) + ((CultureInfo.CurrentCulture.Calendar.IsLeapYear(Year)) ? 2 : 3) - (int)Math.Floor(0.6m * (month + 1));
+
+			if(day < 1)
+			{
+				day += CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(Year, month - 1);
+				month--;
+			}
+
+			return new DateTime(year, month, day);
+		}
+
+		public int GetOrdinal()
+		{
+			var ordinal = Week * 7 + Weekday - (GetJanuaryFourthWeekday(this) + 3);
+
+			if(ordinal < 1)
+			{
+				ordinal += CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year - 1);
+			}
+			else if(ordinal > CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year))
+			{
+				ordinal -= CultureInfo.CurrentCulture.Calendar.GetDaysInYear(Year);
+			}
+
+			return ordinal;
+		}
+
+		public static int GetJanuaryFourthWeekday(WeekDate weekDate)
+		{
+			var t = (weekDate.Year - 1965);
+			t += (int)Math.Floor(0.25m * t);
+			t %= 7;
+			t++;
+
+			//var dateTime = new DateTime(weekDate.Year, 1, 4);
+
+			return t;
+		}
+
+		public static int P(int year) => (year + (year / 4) - (year / 100) + (year / 400)) % 7;
+
+		public static int GetWeekCountInYear(int year) => 52 + ((P(year) == 4 || P(year - 1) == 3) ? 1 : 0);
 
 		/// <summary>
 		/// Gets the ordinal day number in the week of <paramref name="dayOfWeek"/>.
@@ -208,9 +269,9 @@ namespace ISOWeekDate
 			}
 
 			var builder = new StringBuilder(format, format.Length);
-			builder.Replace("YYYY", Year.ToString("F4"));
-			builder.Replace("ww", Week.ToString("F2"));
-			builder.Replace("D", Weekday.ToString("F1"));
+			builder.Replace("YYYY", Year.ToString("D4"));
+			builder.Replace("ww", Week.ToString("D2"));
+			builder.Replace("D", Weekday.ToString("D1"));
 
 			return builder.ToString();
 		}

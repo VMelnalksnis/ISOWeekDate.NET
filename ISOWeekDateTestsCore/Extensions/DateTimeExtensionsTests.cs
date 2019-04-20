@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace ISOWeekDate
+namespace ISOWeekDate.Extensions
 {
 	[TestClass()]
 	public class DateTimeExtensionsTests
