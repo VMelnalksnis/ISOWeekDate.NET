@@ -96,7 +96,7 @@ namespace ISOWeekDate
 
 		[TestMethod]
 		[Priority(1)]
-		public void WeekDateFromDateTime()
+		public void WeekDateFromDateTimeTest()
 		{
 			foreach (var convertedDate in ValidConvertedDates)
 			{
@@ -164,10 +164,86 @@ namespace ISOWeekDate
 			WeekDate.GetWeekdayNumber((DayOfWeek)8);
 		}
 
-		[TestMethod]
+		// [TestMethod]
 		public void GetOrdinalTest()
 		{
 			throw new NotImplementedException();
+		}
+
+		[TestMethod]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void LessThanTest()
+		{
+			var weekdates = ValidConvertedDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex < secondIndex,
+						weekdates[firstIndex] < weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void GreaterThanTest()
+		{
+			var weekdates = ValidConvertedDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex > secondIndex,
+						weekdates[firstIndex] > weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void LessThanOrEqualToTest()
+		{
+			var weekdates = ValidConvertedDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex <= secondIndex,
+						weekdates[firstIndex] <= weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void GreaterThanOrEqualToTest()
+		{
+			var weekdates = ValidConvertedDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex >= secondIndex,
+						weekdates[firstIndex] >= weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
 		}
 
 		[TestMethod]
@@ -238,6 +314,62 @@ namespace ISOWeekDate
 					convertedDate.Value,
 					convertedDate.Key.ToDateTime(CultureInfo.InvariantCulture),
 					$"WeekDate: {convertedDate.Key.ToString("YYYY-Www-D")}");
+			}
+		}
+
+		[TestMethod]
+		[TestCategory("IEquatable")]
+		[TestCategory("Operator")]
+		public void EqualToTest()
+		{
+			var weekdates = ValidConvertedDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex == secondIndex,
+						weekdates[firstIndex] == weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[TestCategory("IEquatable")]
+		[TestCategory("Operator")]
+		public void NotEqualToTest()
+		{
+			var weekdates = ValidConvertedDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex != secondIndex,
+						weekdates[firstIndex] != weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[TestCategory("IEquatable")]
+		public void EqualsTest()
+		{
+			var weekdates = ValidConvertedDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex.Equals(secondIndex),
+						weekdates[firstIndex].Equals(weekdates[secondIndex]),
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
 			}
 		}
 	}
