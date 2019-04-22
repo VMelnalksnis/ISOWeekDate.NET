@@ -109,7 +109,7 @@ namespace ISOWeekDate
 			{
 				Assert.AreEqual(
 					LongYears.Contains(year) ? 53 : 52,
-					WeekDate.GetWeekCountInYear(year),
+					WeekDate.GetWeeksInYear(year),
 					$"{year}");
 			}
 		}
@@ -134,7 +134,7 @@ namespace ISOWeekDate
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Week,
-					WeekDate.GetWeekNumber(convertedDate.Value));
+					WeekDate.GetWeekOfYear(convertedDate.Value));
 			}
 		}
 
@@ -159,29 +159,9 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
-		public void GetJanuaryFourthWeekdayTest()
-		{
-			var date = new WeekDate(2004, 53, 6);
-			var expectedWeekday = 7;
-
-			Assert.AreEqual(
-				expectedWeekday,
-				WeekDate.GetJanuaryFourthWeekday(date));
-
-			Assert.Inconclusive();
-		}
-
-		[TestMethod]
 		public void GetOrdinalTest()
 		{
-			var date = new WeekDate(2008, 39, 6);
-			var expectedOrdinal = 271;
-
-			Assert.AreEqual(
-				expectedOrdinal,
-				date.GetOrdinal());
-
-			Assert.Inconclusive();
+			throw new NotImplementedException();
 		}
 
 		[TestMethod]

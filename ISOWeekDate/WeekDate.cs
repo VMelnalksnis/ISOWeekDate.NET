@@ -16,6 +16,8 @@ namespace ISOWeekDate
 		private const int MinimumWeek = 1;
 		private const int MinimumDay = 1;
 		private const int MaximumDay = 7;
+		private const int WeeksInShortYear = 52;
+		private const int WeeksInLongYear = 53;
 
 		private const string CompleteBasicFormatSpecifier = "d";
 		private const string CompleteBasicFormat = "YYYYWwwD";
@@ -45,7 +47,7 @@ namespace ISOWeekDate
 		public WeekDate(DateTime date)
 		{
 			this.Weekday = GetWeekdayNumber(date.DayOfWeek);
-			this.Week = GetWeekNumber(date);
+			this.Week = GetWeekOfYear(date);
 			this.Year = GetYear(date);
 		}
 
@@ -71,7 +73,7 @@ namespace ISOWeekDate
 				throw new ArgumentOutOfRangeException(nameof(year), year, "Provided year does not represent a valid year.");
 			}
 
-			if (week < MinimumWeek || week > GetWeekCountInYear(year))
+			if (week < MinimumWeek || week > GetWeeksInYear(year))
 			{
 				throw new ArgumentOutOfRangeException(nameof(week), week, "Provided week does not represent a valid ordinal week number.");
 			}
@@ -90,8 +92,7 @@ namespace ISOWeekDate
 		/// Gets the ordinal day number in the week represented by this instance.
 		/// </summary>
 		/// <value>
-		/// The day component, expressed as a value between 1 and 7,
-		/// where 1 represents Monday and 7 represents Sunday.
+		/// The day component, expressed as a value between 1 and 7, where 1 represents Monday and 7 represents Sunday.
 		/// </value>
 		public int Weekday { get; }
 
@@ -111,24 +112,31 @@ namespace ISOWeekDate
 		/// </value>
 		public int Year { get; }
 
-		public static int GetJanuaryFourthWeekday(WeekDate weekDate)
+		/// <summary>
+		/// Returns the number of weeks in the specified year.
+		/// </summary>
+		///
+		/// <param name="year">And integer that represents the year.</param>
+		///
+		/// <returns>The number of weeks in the specified year.</returns>
+		///
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// <paramref name="year"/> is less than 1
+		/// -or-
+		/// <paramref name="year"/> is greater than 9999.
+		/// </exception>
+		///
+		/// <seealso cref="http://www.staff.science.uu.nl/~gent0113/calendar/isocalendar.htm"/>
+		public static int GetWeeksInYear(int year)
 		{
-			var t = weekDate.Year - 1965;
-			t += (int)Math.Floor(0.25m * t);
-			t %= 7;
-			t++;
+			if (year < MinimumYear || year > MaximumYear)
+			{
+				throw new ArgumentOutOfRangeException(nameof(year), year, "Year is outside the range defined by ISO 8601.");
+			}
 
-			return t;
-		}
+			int F(int x) => (x + (x / 4) - (x / 100) + (x / 400)) % 7;
 
-		public static int P(int year)
-		{
-			return (year + (year / 4) - (year / 100) + (year / 400)) % 7;
-		}
-
-		public static int GetWeekCountInYear(int year)
-		{
-			return 52 + ((P(year) == 4 || P(year - 1) == 3) ? 1 : 0);
+			return F(year) == 4 || F(year - 1) == 3 ? WeeksInLongYear : WeeksInShortYear;
 		}
 
 		/// <summary>
@@ -176,7 +184,7 @@ namespace ISOWeekDate
 		/// <returns>
 		/// An integer that represents the week date week in <paramref name="dateTime"/>.
 		/// </returns>
-		public static int GetWeekNumber(DateTime dateTime)
+		public static int GetWeekOfYear(DateTime dateTime)
 		{
 			// Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
 			// be the same week# as whatever Thursday, Friday or Saturday are,
@@ -206,33 +214,29 @@ namespace ISOWeekDate
 			return dateTime.AddDays(4 - GetWeekdayNumber(dateTime.DayOfWeek)).Year;
 		}
 
-		public int GetOrdinal()
-		{
-			var ordinal = (this.Week * 7) + this.Weekday - (GetJanuaryFourthWeekday(this) + 3);
-
-			if (ordinal < 1)
-			{
-				ordinal += CultureInfo.CurrentCulture.Calendar.GetDaysInYear(this.Year - 1);
-			}
-			else if (ordinal > CultureInfo.CurrentCulture.Calendar.GetDaysInYear(this.Year))
-			{
-				ordinal -= CultureInfo.CurrentCulture.Calendar.GetDaysInYear(this.Year);
-			}
-
-			return ordinal;
-		}
-
-// These versions don't support IConvertible; this is the only method that has an actual implementation
+		// These versions don't support IConvertible; this is the only method that has an actual implementation
 #if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD1_2
 
 		public DateTime ToDateTime(IFormatProvider provider)
 		{
-			var ordinalDay = (this.Week * 7) + this.Weekday - (GetJanuaryFourthWeekday(this) + 3);
+			var ordinalDay = (this.Week * 7) + this.Weekday - (GetWeekdayNumber(new DateTime(this.Year, 1, 4).DayOfWeek) + 3);
 
-			return new DateTime(this.Year, 1, 1).AddDays(ordinalDay - 1);
+			return new DateTime(this.Year, 1, 1).AddDays(this.GetDayOfYear() - 1);
 		}
 
 #endif
+
+		/// <summary>
+		/// Returns the ordinal day number in the year represented by this instace.
+		/// </summary>
+		///
+		/// <returns>
+		/// A positive integer that represents the ordinal day of the year of the current instance.
+		/// </returns>
+		public int GetDayOfYear()
+		{
+			return (this.Week * 7) + this.Weekday - (GetWeekdayNumber(new DateTime(this.Year, 1, 4).DayOfWeek) + 3);
+		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
@@ -345,9 +349,7 @@ namespace ISOWeekDate
 		/// <inheritdoc/>
 		public DateTime ToDateTime(IFormatProvider provider)
 		{
-			var ordinalDay = (this.Week * 7) + this.Weekday - (GetJanuaryFourthWeekday(this) + 3);
-
-			return new DateTime(this.Year, 1, 1).AddDays(ordinalDay - 1);
+			return new DateTime(this.Year, 1, 1).AddDays(this.GetDayOfYear() - 1);
 		}
 
 		/// <inheritdoc/>

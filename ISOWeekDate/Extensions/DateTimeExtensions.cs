@@ -11,7 +11,7 @@ namespace ISOWeekDate.Extensions
 
 		public static int GetWeekNumber(this DateTime dateTime)
 		{
-			return WeekDate.GetWeekNumber(dateTime);
+			return WeekDate.GetWeekOfYear(dateTime);
 		}
 
 		public static int GetISOWeekDateYear(this DateTime dateTime)
