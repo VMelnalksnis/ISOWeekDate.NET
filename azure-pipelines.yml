@@ -29,7 +29,6 @@ steps:
     clean: true
     maximumCpuCount: true
 
-- task: VSTest@2
+- task: DotNetCoreCLI@2
   inputs:
-    testSelector: 'testAssemblies'
-    runInParallel: true
+    command: 'test'
