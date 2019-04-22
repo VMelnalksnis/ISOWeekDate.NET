@@ -1,26 +1,26 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ISOWeekDate.Extensions
 {
-	[TestClass()]
+	[TestClass]
 	public class DateTimeExtensionsTests
 	{
-		[TestMethod()]
+		[TestMethod]
 		[TestCategory("Not Implemented")]
 		public void GetISOWeekDateDayTest()
 		{
 			throw new NotImplementedException();
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[TestCategory("Not Implemented")]
 		public void GetISOWeekDateWeekTest()
 		{
 			throw new NotImplementedException();
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[TestCategory("Not Implemented")]
 		public void GetISOWeekDateYearTest()
 		{

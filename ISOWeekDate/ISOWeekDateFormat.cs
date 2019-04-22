@@ -1,16 +1,32 @@
-﻿using ISOWeekDate.Extensions;
-using System;
+﻿using System;
 using System.Globalization;
+using ISOWeekDate.Extensions;
 
 namespace ISOWeekDate
 {
 	public class ISOWeekDateFormat : IFormatProvider, ICustomFormatter
 	{
-		public static string ShortCompactPatternSpecifier { get { return "v"; } }
-		public static string ShortExtendedPatternSpecifier { get { return "V"; } }
-		public static string FullCompactPatternSpecifier { get { return "w"; } }
-		public static string FullExtendedPatternSpecifier { get { return "W"; } }
+		public static string ShortCompactPatternSpecifier
+		{
+			get { return "v"; }
+		}
 
+		public static string ShortExtendedPatternSpecifier
+		{
+			get { return "V"; }
+		}
+
+		public static string FullCompactPatternSpecifier
+		{
+			get { return "w"; }
+		}
+
+		public static string FullExtendedPatternSpecifier
+		{
+			get { return "W"; }
+		}
+
+		/// <inheritdoc/>
 		public object GetFormat(Type formatType)
 		{
 			if (formatType == typeof(ICustomFormatter))
@@ -23,6 +39,7 @@ namespace ISOWeekDate
 			}
 		}
 
+		/// <inheritdoc/>
 		public string Format(string format, object arg, IFormatProvider formatProvider)
 		{
 			// Provide default formatting if arg is not an DateTime
@@ -30,7 +47,7 @@ namespace ISOWeekDate
 			{
 				try
 				{
-					return HandleOtherFormats(format, arg);
+					return this.HandleOtherFormats(format, arg);
 				}
 				catch (FormatException e)
 				{
@@ -61,7 +78,7 @@ namespace ISOWeekDate
 				// Provide default formatting for unsupported format strings.
 				try
 				{
-					return HandleOtherFormats(format, arg);
+					return this.HandleOtherFormats(format, arg);
 				}
 				catch (FormatException e)
 				{

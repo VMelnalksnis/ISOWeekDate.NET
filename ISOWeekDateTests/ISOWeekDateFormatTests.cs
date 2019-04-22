@@ -1,33 +1,33 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ISOWeekDate
 {
-	[TestClass()]
+	[TestClass]
 	public class ISOWeekDateFormatTests
 	{
-		[TestMethod()]
+		[TestMethod]
 		[TestCategory("Not Implemented")]
 		public void ShortCompactPatternTest()
 		{
 			throw new NotImplementedException();
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[TestCategory("Not Implemented")]
 		public void ShortExtendedPatternTest()
 		{
 			throw new NotImplementedException();
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[TestCategory("Not Implemented")]
 		public void FullCompactPatternTest()
 		{
 			throw new NotImplementedException();
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[TestCategory("Not Implemented")]
 		public void FullExtendedPatternTest()
 		{
