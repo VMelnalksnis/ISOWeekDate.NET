@@ -11,8 +11,15 @@ namespace ISOWeekDate
 	{
 		// In a 400-year cycle 71 years have 53 weeks, the rest have 52.
 		// Source: https://en.wikipedia.org/wiki/ISO_week_date#Weeks_per_year
+
+		/// <summary>
+		/// The number of years in an ISO calendar cycle.
+		/// </summary>
 		internal const int CycleLength = 400;
 #pragma warning disable SA1137 // Elements should have the same indentation
+		/// <summary>
+		/// All the years from 1 through <see cref="CycleLength"/> that are 53 weeks long.
+		/// </summary>
 		internal static readonly List<int> LongYears = new List<int>()
 			{
 				4,      9,      15,     20,     26,
@@ -88,7 +95,6 @@ namespace ISOWeekDate
 			};
 
 		[TestMethod]
-		[TestCategory("Constructor")]
 		[Priority(1)]
 		public void WeekDateFromDateTime()
 		{
@@ -165,20 +171,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
-		public void ToDateTimeTest()
-		{
-			foreach (var convertedDate in ValidConvertedDates)
-			{
-				Assert.AreEqual(
-					convertedDate.Value,
-					convertedDate.Key.ToDateTime(CultureInfo.InvariantCulture),
-					$"WeekDate: {convertedDate.Key.ToString("YYYY-Www-D")}");
-			}
-		}
-
-		[TestMethod]
-		[Priority(2)]
-		[TestCategory("Comparison")]
+		[TestCategory("IComparable")]
 		public void CompareToWeekDateTest()
 		{
 			var weekdates = ValidConvertedDates.Keys.ToArray();
@@ -196,16 +189,14 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
-		[Priority(2)]
-		[TestCategory("Comparison")]
+		[TestCategory("IComparable")]
 		public void CompareToWeekDateNullTest()
 		{
 			Assert.AreEqual(1, ValidConvertedDates.Keys.First().CompareTo(null));
 		}
 
 		[TestMethod]
-		[Priority(2)]
-		[TestCategory("Comparison")]
+		[TestCategory("IComparable")]
 		public void CompareToObjectTest()
 		{
 			var weekdates = ValidConvertedDates.Keys.ToArray();
@@ -223,20 +214,31 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
-		[Priority(2)]
-		[TestCategory("Comparison")]
+		[TestCategory("IComparable")]
 		public void CompareToObjectNullTest()
 		{
 			Assert.AreEqual(1, ValidConvertedDates.Keys.First().CompareTo((object)null));
 		}
 
 		[TestMethod]
-		[Priority(2)]
-		[TestCategory("Comparison")]
+		[TestCategory("IComparable")]
 		[ExpectedException(typeof(ArgumentException))]
 		public void CompareToObjectArgumentExceptionTest()
 		{
 			ValidConvertedDates.Keys.First().CompareTo(new object());
+		}
+
+		[TestMethod]
+		[TestCategory("IConvertible")]
+		public void ToDateTimeTest()
+		{
+			foreach (var convertedDate in ValidConvertedDates)
+			{
+				Assert.AreEqual(
+					convertedDate.Value,
+					convertedDate.Key.ToDateTime(CultureInfo.InvariantCulture),
+					$"WeekDate: {convertedDate.Key.ToString("YYYY-Www-D")}");
+			}
 		}
 	}
 }

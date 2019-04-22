@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ISOWeekDate;
 
 namespace ISOWeekDate.Extensions
 {
@@ -7,24 +8,42 @@ namespace ISOWeekDate.Extensions
 	public class DateTimeExtensionsTests
 	{
 		[TestMethod]
-		[TestCategory("Not Implemented")]
+		[TestCategory("Extensions")]
 		public void GetISOWeekDateDayTest()
 		{
-			throw new NotImplementedException();
+			foreach (var convertedDate in WeekDateTests.ValidConvertedDates)
+			{
+				Assert.AreEqual(
+					convertedDate.Key.Weekday,
+					convertedDate.Value.GetWeekDateDay(),
+					convertedDate.Value.ToShortDateString());
+			}
 		}
 
 		[TestMethod]
-		[TestCategory("Not Implemented")]
+		[TestCategory("Extensions")]
 		public void GetISOWeekDateWeekTest()
 		{
-			throw new NotImplementedException();
+			foreach (var convertedDate in WeekDateTests.ValidConvertedDates)
+			{
+				Assert.AreEqual(
+					convertedDate.Key.Week,
+					convertedDate.Value.GetWeekDateWeek(),
+					convertedDate.Value.ToShortDateString());
+			}
 		}
 
 		[TestMethod]
-		[TestCategory("Not Implemented")]
+		[TestCategory("Extensions")]
 		public void GetISOWeekDateYearTest()
 		{
-			throw new NotImplementedException();
+			foreach (var convertedDate in WeekDateTests.ValidConvertedDates)
+			{
+				Assert.AreEqual(
+					convertedDate.Key.Year,
+					convertedDate.Value.GetWeekDateYear(),
+					convertedDate.Value.ToShortDateString());
+			}
 		}
 	}
 }
