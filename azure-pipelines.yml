@@ -32,5 +32,4 @@ steps:
 - task: VSTest@2
   inputs:
     testSelector: 'testAssemblies'
-    testFiltercriteria: 'TestCategory!=Not Implemented'
     runInParallel: true
