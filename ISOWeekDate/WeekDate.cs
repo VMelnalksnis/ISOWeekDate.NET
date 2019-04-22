@@ -206,13 +206,6 @@ namespace ISOWeekDate
 			return dateTime.AddDays(4 - GetWeekdayNumber(dateTime.DayOfWeek)).Year;
 		}
 
-		public DateTime GetDateTime()
-		{
-			var ordinalDay = (this.Week * 7) + this.Weekday - (GetJanuaryFourthWeekday(this) + 3);
-
-			return new DateTime(this.Year, 1, 1).AddDays(ordinalDay - 1);
-		}
-
 		public int GetOrdinal()
 		{
 			var ordinal = (this.Week * 7) + this.Weekday - (GetJanuaryFourthWeekday(this) + 3);
@@ -228,6 +221,18 @@ namespace ISOWeekDate
 
 			return ordinal;
 		}
+
+// These versions don't support IConvertible; this is the only method that has an actual implementation
+#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD1_2
+
+		public DateTime ToDateTime(IFormatProvider provider)
+		{
+			var ordinalDay = (this.Week * 7) + this.Weekday - (GetJanuaryFourthWeekday(this) + 3);
+
+			return new DateTime(this.Year, 1, 1).AddDays(ordinalDay - 1);
+		}
+
+#endif
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
@@ -307,6 +312,118 @@ namespace ISOWeekDate
 			}
 		}
 	}
+
+// IConvertible is support from .NETStandard 1.3 and forward
+#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2
+
+	public partial class WeekDate : IConvertible
+	{
+		/// <inheritdoc/>
+		public TypeCode GetTypeCode()
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <inheritdoc/>
+		public bool ToBoolean(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public byte ToByte(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public char ToChar(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public DateTime ToDateTime(IFormatProvider provider)
+		{
+			var ordinalDay = (this.Week * 7) + this.Weekday - (GetJanuaryFourthWeekday(this) + 3);
+
+			return new DateTime(this.Year, 1, 1).AddDays(ordinalDay - 1);
+		}
+
+		/// <inheritdoc/>
+		public decimal ToDecimal(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public double ToDouble(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public short ToInt16(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public int ToInt32(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public long ToInt64(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public sbyte ToSByte(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public float ToSingle(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public string ToString(IFormatProvider provider)
+		{
+			return this.ToString();
+		}
+
+		/// <inheritdoc/>
+		public object ToType(Type conversionType, IFormatProvider provider)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <inheritdoc/>
+		public ushort ToUInt16(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public uint ToUInt32(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+
+		/// <inheritdoc/>
+		public ulong ToUInt64(IFormatProvider provider)
+		{
+			throw new InvalidCastException();
+		}
+	}
+
+#endif
 
 	public partial class WeekDate : IEquatable<WeekDate>
 	{

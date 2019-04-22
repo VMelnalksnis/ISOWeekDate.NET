@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -184,13 +185,13 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
-		public void GetDateTime()
+		public void ToDateTimeTest()
 		{
 			foreach (var convertedDate in ValidConvertedDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Value,
-					convertedDate.Key.GetDateTime(),
+					convertedDate.Key.ToDateTime(CultureInfo.InvariantCulture),
 					$"WeekDate: {convertedDate.Key.ToString("YYYY-Www-D")}");
 			}
 		}
