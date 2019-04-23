@@ -11,7 +11,7 @@ namespace ISOWeekDate.Extensions
 		[TestCategory("Extensions")]
 		public void GetISOWeekDateDayTest()
 		{
-			foreach (var convertedDate in WeekDateTests.ValidConvertedDates)
+			foreach (var convertedDate in WeekDateTests.DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Weekday,
@@ -24,7 +24,7 @@ namespace ISOWeekDate.Extensions
 		[TestCategory("Extensions")]
 		public void GetISOWeekDateWeekTest()
 		{
-			foreach (var convertedDate in WeekDateTests.ValidConvertedDates)
+			foreach (var convertedDate in WeekDateTests.DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Week,
@@ -37,7 +37,7 @@ namespace ISOWeekDate.Extensions
 		[TestCategory("Extensions")]
 		public void GetISOWeekDateYearTest()
 		{
-			foreach (var convertedDate in WeekDateTests.ValidConvertedDates)
+			foreach (var convertedDate in WeekDateTests.DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Year,

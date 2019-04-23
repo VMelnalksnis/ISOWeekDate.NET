@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+
+[assembly: InternalsVisibleTo("ISOWeekDateTests")]
 
 namespace ISOWeekDate
 {
@@ -32,7 +35,7 @@ namespace ISOWeekDate
 		private const string ReducedExtendedFormatSpecifier = "Y";
 		private const string ReducedExtendedFormat = "YYYY-Www";
 
-		private static readonly Dictionary<string, string> Formats = new Dictionary<string, string>()
+		internal static readonly Dictionary<string, string> Formats = new Dictionary<string, string>()
 		{
 			{ CompleteBasicFormatSpecifier, CompleteBasicFormat },
 			{ CompleteExtendedFormatSpecifier, CompleteExtendedFormat },
@@ -288,7 +291,7 @@ namespace ISOWeekDate
 			{
 				throw new FormatException("Format string is empty.");
 			}
-			else if (!Formats.Keys.Contains(s) && !Formats.Values.Contains(format))
+			else if (!Formats.Keys.Contains(format) && !Formats.Values.Contains(format))
 			{
 				throw new FormatException($"Format {format} is not a valid week date format.");
 			}
@@ -324,7 +327,7 @@ namespace ISOWeekDate
 				{
 					var dayString = s.Split('W')[1].Substring(2).TrimStart('-');
 
-					if (!int.TryParse(weekString, out var day))
+					if (!int.TryParse(dayString, out var day))
 					{
 						throw new FormatException($"String {s} does not contain an ISO 8601 week date that corresponds to the patern specified in format {format}.");
 					}

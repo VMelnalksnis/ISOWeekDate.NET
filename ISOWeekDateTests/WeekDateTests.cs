@@ -44,7 +44,7 @@ namespace ISOWeekDate
 		/// <summary>
 		/// Must be in ascending order.
 		/// </summary>
-		internal static readonly Dictionary<WeekDate, DateTime> ValidConvertedDates = new Dictionary<WeekDate, DateTime>()
+		internal static readonly Dictionary<WeekDate, DateTime> DateTimesByWeekDates = new Dictionary<WeekDate, DateTime>()
 			{
 				{ new WeekDate(1980, 40, 1), new DateTime(1980, 9, 29) },
 
@@ -94,11 +94,23 @@ namespace ISOWeekDate
 				{ 7, DayOfWeek.Sunday },
 			};
 
+		internal static readonly Dictionary<KeyValuePair<string, string>, WeekDate> WeekDatesByFormats = new Dictionary<KeyValuePair<string, string>, WeekDate>()
+		{
+			{ new KeyValuePair<string, string>("D", "1980-W40-1"), new WeekDate(1980, 40, 1) },
+			{ new KeyValuePair<string, string>("d", "1980W401"), new WeekDate(1980, 40, 1) },
+			{ new KeyValuePair<string, string>("Y", "1980-W40"), new WeekDate(1980, 40) },
+			{ new KeyValuePair<string, string>("y", "1980W40"), new WeekDate(1980, 40) },
+			{ new KeyValuePair<string, string>("D", "2032-W10-1"), new WeekDate(2032, 10, 1) },
+			{ new KeyValuePair<string, string>("d", "2032W101"), new WeekDate(2032, 10, 1) },
+			{ new KeyValuePair<string, string>("Y", "2032-W10"), new WeekDate(2032, 10) },
+			{ new KeyValuePair<string, string>("y", "2032W10"), new WeekDate(2032, 10) },
+		};
+
 		[TestMethod]
 		[Priority(1)]
 		public void WeekDateFromDateTimeTest()
 		{
-			foreach (var convertedDate in ValidConvertedDates)
+			foreach (var convertedDate in DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key,
@@ -136,7 +148,7 @@ namespace ISOWeekDate
 		[Priority(1)]
 		public void GetWeekNumberTest()
 		{
-			foreach (var convertedDate in ValidConvertedDates)
+			foreach (var convertedDate in DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Week,
@@ -148,7 +160,7 @@ namespace ISOWeekDate
 		[Priority(1)]
 		public void GetYearTest()
 		{
-			foreach (var convertedDate in ValidConvertedDates)
+			foreach (var convertedDate in DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Year,
@@ -164,6 +176,24 @@ namespace ISOWeekDate
 			WeekDate.GetWeekdayNumber((DayOfWeek)8);
 		}
 
+		[TestMethod]
+		[Priority(2)]
+		public void ParseExactFormatSpecifiersTest()
+		{
+			foreach (KeyValuePair<KeyValuePair<string, string>, WeekDate> weekDateByFormat in WeekDatesByFormats)
+			{
+				Assert.AreEqual(
+					weekDateByFormat.Value,
+					WeekDate.ParseExact(weekDateByFormat.Key.Value, weekDateByFormat.Key.Key),
+					$"Format: {weekDateByFormat.Key.Key}; String: {weekDateByFormat.Key.Value}");
+
+				Assert.AreEqual(
+					weekDateByFormat.Value,
+					WeekDate.ParseExact(weekDateByFormat.Key.Value, WeekDate.Formats[weekDateByFormat.Key.Key]),
+					$"Format: {WeekDate.Formats[weekDateByFormat.Key.Key]}; String: {weekDateByFormat.Key.Value}");
+			}
+		}
+
 		// [TestMethod]
 		public void GetOrdinalTest()
 		{
@@ -175,7 +205,7 @@ namespace ISOWeekDate
 		[TestCategory("Operator")]
 		public void LessThanTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -194,7 +224,7 @@ namespace ISOWeekDate
 		[TestCategory("Operator")]
 		public void GreaterThanTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -213,7 +243,7 @@ namespace ISOWeekDate
 		[TestCategory("Operator")]
 		public void LessThanOrEqualToTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -232,7 +262,7 @@ namespace ISOWeekDate
 		[TestCategory("Operator")]
 		public void GreaterThanOrEqualToTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -250,7 +280,7 @@ namespace ISOWeekDate
 		[TestCategory("IComparable")]
 		public void CompareToWeekDateTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -268,14 +298,14 @@ namespace ISOWeekDate
 		[TestCategory("IComparable")]
 		public void CompareToWeekDateNullTest()
 		{
-			Assert.AreEqual(1, ValidConvertedDates.Keys.First().CompareTo(null));
+			Assert.AreEqual(1, DateTimesByWeekDates.Keys.First().CompareTo(null));
 		}
 
 		[TestMethod]
 		[TestCategory("IComparable")]
 		public void CompareToObjectTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -293,7 +323,7 @@ namespace ISOWeekDate
 		[TestCategory("IComparable")]
 		public void CompareToObjectNullTest()
 		{
-			Assert.AreEqual(1, ValidConvertedDates.Keys.First().CompareTo((object)null));
+			Assert.AreEqual(1, DateTimesByWeekDates.Keys.First().CompareTo((object)null));
 		}
 
 		[TestMethod]
@@ -301,14 +331,14 @@ namespace ISOWeekDate
 		[ExpectedException(typeof(ArgumentException))]
 		public void CompareToObjectArgumentExceptionTest()
 		{
-			ValidConvertedDates.Keys.First().CompareTo(new object());
+			DateTimesByWeekDates.Keys.First().CompareTo(new object());
 		}
 
 		[TestMethod]
 		[TestCategory("IConvertible")]
 		public void ToDateTimeTest()
 		{
-			foreach (var convertedDate in ValidConvertedDates)
+			foreach (var convertedDate in DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Value,
@@ -322,7 +352,7 @@ namespace ISOWeekDate
 		[TestCategory("Operator")]
 		public void EqualToTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -341,7 +371,7 @@ namespace ISOWeekDate
 		[TestCategory("Operator")]
 		public void NotEqualToTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -359,7 +389,7 @@ namespace ISOWeekDate
 		[TestCategory("IEquatable")]
 		public void EqualsTest()
 		{
-			var weekdates = ValidConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
