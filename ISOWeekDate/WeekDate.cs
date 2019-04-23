@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace ISOWeekDate
@@ -40,7 +41,7 @@ namespace ISOWeekDate
 		};
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="WeekDate"/> class to a specified date.
+		/// Initializes a new instance of the <see cref="WeekDate"/> class to the specified date.
 		/// </summary>
 		///
 		/// <param name="date">The date.</param>
@@ -86,6 +87,38 @@ namespace ISOWeekDate
 			this.Year = year;
 			this.Week = week;
 			this.Weekday = weekday;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WeekDate"/> class to the specified year and week, and a day of 0.
+		/// </summary>
+		///
+		/// <param name="year">The year (1 through 9999)>.</param>
+		/// <param name="week">The week (1 through the number of weeks in <paramref name="year"/>).</param>
+		///
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// <paramref name="year"/> is less than 1 or greater than 9999.
+		/// -or-
+		/// <paramref name="week"/> is less than 1 or greater than week count in <paramref name="year"/>.
+		/// </exception>
+		///
+		/// <remarks>
+		/// This is intended to only be used when parsing reduced format week date strings, which don't contain the day of the week.
+		/// </remarks>
+		internal WeekDate(int year, int week)
+		{
+			if (year < MinimumYear || year > MaximumYear)
+			{
+				throw new ArgumentOutOfRangeException(nameof(year), year, "Provided year does not represent a valid year.");
+			}
+
+			if (week < MinimumWeek || week > GetWeeksInYear(year))
+			{
+				throw new ArgumentOutOfRangeException(nameof(week), week, "Provided week does not represent a valid ordinal week number.");
+			}
+
+			this.Year = year;
+			this.Week = week;
 		}
 
 		/// <summary>
@@ -212,6 +245,101 @@ namespace ISOWeekDate
 		{
 			// The year of a week is equal to whatever the date is of the thursday of that week
 			return dateTime.AddDays(4 - GetWeekdayNumber(dateTime.DayOfWeek)).Year;
+		}
+
+		/// <summary>
+		/// Converts the specified string representation of a ISO 8601 week date to its <see cref="WeekDate"/> equivalent using the specified format. The format of the string representation must match the specified format exactly.
+		/// </summary>
+		///
+		/// <param name="s">A string that contains a date and time to convert.</param>
+		/// <param name="format">A format specifier that defines the required format of <paramref name="s"/>.</param>
+		///
+		/// <returns>
+		/// An object that is equivalent to the date and time contained in <paramref name="s"/>, as specified by <paramref name="format"/>.
+		/// </returns>
+		///
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="s"/> or <paramref name="format"/> is <see langword="null"/>.
+		/// </exception>
+		///
+		/// <exception cref="FormatException">
+		/// <paramref name="s"/> or <paramref name="format"/> is an empty string.
+		/// -or-
+		/// <paramref name="format"/> is not a valid ISO 8601 week date format.
+		/// -or-
+		/// <paramref name="s"/> does not contain an ISO 8601 week date that corresponds to the pattern specified in <paramref name="format"/>.
+		/// </exception>
+		public static WeekDate ParseExact(string s, string format)
+		{
+			if (s == null)
+			{
+				throw new ArgumentNullException(nameof(s));
+			}
+			else if (s == string.Empty)
+			{
+				throw new FormatException("Source string is empty.");
+			}
+
+			if (format == null)
+			{
+				throw new ArgumentNullException(nameof(format));
+			}
+			else if (format == string.Empty)
+			{
+				throw new FormatException("Format string is empty.");
+			}
+			else if (!Formats.Keys.Contains(s) && !Formats.Values.Contains(format))
+			{
+				throw new FormatException($"Format {format} is not a valid week date format.");
+			}
+
+			// If format is a specifier, get the format it represents
+			if (Formats.Keys.Contains(format))
+			{
+				format = Formats[format];
+			}
+
+			if (s.Length != format.Length)
+			{
+				throw new FormatException($"String {s} does not contain an ISO 8601 week date that corresponds to the patern specified in format {format}.");
+			}
+
+			try
+			{
+				var yearString = s.Split('W')[0].TrimEnd('-');
+
+				if (!int.TryParse(yearString, out var year))
+				{
+					throw new FormatException($"String {s} does not contain an ISO 8601 week date that corresponds to the patern specified in format {format}.");
+				}
+
+				var weekString = s.Split('W')[1].Substring(0, 2);
+
+				if (!int.TryParse(weekString, out var week))
+				{
+					throw new FormatException($"String {s} does not contain an ISO 8601 week date that corresponds to the patern specified in format {format}.");
+				}
+
+				if (format == CompleteBasicFormat || format == CompleteExtendedFormat)
+				{
+					var dayString = s.Split('W')[1].Substring(2).TrimStart('-');
+
+					if (!int.TryParse(weekString, out var day))
+					{
+						throw new FormatException($"String {s} does not contain an ISO 8601 week date that corresponds to the patern specified in format {format}.");
+					}
+
+					return new WeekDate(year, week, day);
+				}
+				else
+				{
+					return new WeekDate(year, week);
+				}
+			}
+			catch (ArgumentOutOfRangeException e)
+			{
+				throw new FormatException($"String {s} does not contain an ISO 8601 week date that corresponds to the patern specified in format {format}.", e);
+			}
 		}
 
 		// These versions don't support IConvertible; this is the only method that has an actual implementation
