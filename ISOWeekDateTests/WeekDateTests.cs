@@ -108,6 +108,56 @@ namespace ISOWeekDate
 
 		[TestMethod]
 		[Priority(1)]
+		[TestCategory("Constructor")]
+		public void WeekDateFromComponentsTest()
+		{
+			foreach (WeekDate weekDate in DateTimesByWeekDates.Keys)
+			{
+				Assert.AreEqual(
+					weekDate,
+					new WeekDate(weekDate.Year, weekDate.Week, weekDate.Weekday));
+			}
+		}
+
+		[TestMethod]
+		[Priority(1)]
+		[TestCategory("Constructor")]
+		public void WeekDateFromComponentsOutOfRangeTest()
+		{
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(0, 1, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(10000, 1, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, 0, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, WeekDate.GetWeeksInYear(2000) + 1, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, 1, 0);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, 1, 8);
+			});
+		}
+
+		[TestMethod]
+		[Priority(1)]
+		[TestCategory("Constructor")]
 		public void WeekDateFromDateTimeTest()
 		{
 			foreach (var convertedDate in DateTimesByWeekDates)
@@ -121,7 +171,7 @@ namespace ISOWeekDate
 
 		[TestMethod]
 		[Priority(1)]
-		public void GetWeekCountInYearTest()
+		public void GetWeeksInYearTest()
 		{
 			for (int year = 1; year <= CycleLength; year++)
 			{
@@ -130,6 +180,22 @@ namespace ISOWeekDate
 					WeekDate.GetWeeksInYear(year),
 					$"{year}");
 			}
+		}
+
+		[TestMethod]
+		[Priority(1)]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void GetWeeksInYearLessThanMinimalTest()
+		{
+			WeekDate.GetWeeksInYear(-1);
+		}
+
+		[TestMethod]
+		[Priority(1)]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void GetWeeksInYearMoreThanMaximalTest()
+		{
+			WeekDate.GetWeeksInYear(10000);
 		}
 
 		[TestMethod]
