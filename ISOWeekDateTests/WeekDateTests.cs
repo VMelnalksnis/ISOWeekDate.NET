@@ -194,6 +194,46 @@ namespace ISOWeekDate
 			}
 		}
 
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(ArgumentNullException))]
+		public void ParseExactNullSourceStringTest()
+		{
+			WeekDate.ParseExact(null, "d");
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(ArgumentNullException))]
+		public void ParseExactNullFormatStringTest()
+		{
+			WeekDate.ParseExact("2019-W10-1", null);
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(FormatException))]
+		public void ParseExactEmptySourceStringTest()
+		{
+			WeekDate.ParseExact(string.Empty, "d");
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(FormatException))]
+		public void ParseExactEmptyFormatStringTest()
+		{
+			WeekDate.ParseExact("2019-W10-1", string.Empty);
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(FormatException))]
+		public void ParseExactInvalidFormatStringTest()
+		{
+			WeekDate.ParseExact("2019-W10-1", DateTimeFormatInfo.InvariantInfo.FullDateTimePattern);
+		}
+
 		// [TestMethod]
 		public void GetOrdinalTest()
 		{
@@ -201,6 +241,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		[TestCategory("Operator")]
 		public void LessThanTest()
@@ -220,6 +261,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		[TestCategory("Operator")]
 		public void GreaterThanTest()
@@ -239,6 +281,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		[TestCategory("Operator")]
 		public void LessThanOrEqualToTest()
@@ -258,6 +301,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		[TestCategory("Operator")]
 		public void GreaterThanOrEqualToTest()
@@ -277,6 +321,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		public void CompareToWeekDateTest()
 		{
@@ -295,6 +340,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		public void CompareToWeekDateNullTest()
 		{
@@ -302,6 +348,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		public void CompareToObjectTest()
 		{
@@ -320,6 +367,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		public void CompareToObjectNullTest()
 		{
@@ -327,6 +375,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IComparable")]
 		[ExpectedException(typeof(ArgumentException))]
 		public void CompareToObjectArgumentExceptionTest()
@@ -335,6 +384,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IConvertible")]
 		public void ToDateTimeTest()
 		{
@@ -348,6 +398,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IEquatable")]
 		[TestCategory("Operator")]
 		public void EqualToTest()
@@ -367,6 +418,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IEquatable")]
 		[TestCategory("Operator")]
 		public void NotEqualToTest()
@@ -386,6 +438,7 @@ namespace ISOWeekDate
 		}
 
 		[TestMethod]
+		[Priority(2)]
 		[TestCategory("IEquatable")]
 		public void EqualsTest()
 		{

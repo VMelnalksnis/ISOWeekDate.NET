@@ -8,6 +8,7 @@ namespace ISOWeekDate.Extensions
 	public class DateTimeExtensionsTests
 	{
 		[TestMethod]
+		[Priority(1)]
 		[TestCategory("Extensions")]
 		public void GetISOWeekDateDayTest()
 		{
@@ -21,6 +22,7 @@ namespace ISOWeekDate.Extensions
 		}
 
 		[TestMethod]
+		[Priority(1)]
 		[TestCategory("Extensions")]
 		public void GetISOWeekDateWeekTest()
 		{
@@ -34,6 +36,7 @@ namespace ISOWeekDate.Extensions
 		}
 
 		[TestMethod]
+		[Priority(1)]
 		[TestCategory("Extensions")]
 		public void GetISOWeekDateYearTest()
 		{
