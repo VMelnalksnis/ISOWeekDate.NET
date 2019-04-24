@@ -71,24 +71,13 @@ namespace ISOWeekDate
 		/// <paramref name="weekday"/> is less than 1 or greater than 7.
 		/// </exception>
 		public WeekDate(int year, int week, int weekday)
+			: this(year, week)
 		{
-			if (year < MinimumYear || year > MaximumYear)
-			{
-				throw new ArgumentOutOfRangeException(nameof(year), year, "Provided year does not represent a valid year.");
-			}
-
-			if (week < MinimumWeek || week > GetWeeksInYear(year))
-			{
-				throw new ArgumentOutOfRangeException(nameof(week), week, "Provided week does not represent a valid ordinal week number.");
-			}
-
 			if (weekday < MinimumDay || weekday > MaximumDay)
 			{
 				throw new ArgumentOutOfRangeException(nameof(weekday), weekday, "Provided weekday does not represent a valid ordinal day number.");
 			}
 
-			this.Year = year;
-			this.Week = week;
 			this.Weekday = weekday;
 		}
 
