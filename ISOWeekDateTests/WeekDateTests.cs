@@ -1,17 +1,26 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ISOWeekDate
 {
-	[TestClass()]
+	[TestClass]
 	public class WeekDateTests
 	{
 		// In a 400-year cycle 71 years have 53 weeks, the rest have 52.
 		// Source: https://en.wikipedia.org/wiki/ISO_week_date#Weeks_per_year
-		internal const int cycleLength = 400;
-		internal static readonly List<int> longYears = new List<int>()
+
+		/// <summary>
+		/// The number of years in an ISO calendar cycle.
+		/// </summary>
+		internal const int CycleLength = 400;
+#pragma warning disable SA1137 // Elements should have the same indentation
+		/// <summary>
+		/// All the years from 1 through <see cref="CycleLength"/> that are 53 weeks long.
+		/// </summary>
+		internal static readonly List<int> LongYears = new List<int>()
 			{
 				4,      9,      15,     20,     26,
 				32,     37,     43,     48,     54,
@@ -28,36 +37,34 @@ namespace ISOWeekDate
 								303,    308,    314,
 				320,    325,    331,    336,    342,
 				348,    353,    359,    364,    370,
-				376,    381,    387,    392,    398
+				376,    381,    387,    392,    398,
 			};
+#pragma warning restore SA1137 // Elements should have the same indentation
+
 		/// <summary>
-		/// 
-		/// </summary>
-		/// <remarks>
 		/// Must be in ascending order.
-		/// </remarks>
-		internal static readonly Dictionary<WeekDate, DateTime> validConvertedDates = new Dictionary<WeekDate, DateTime>()
+		/// </summary>
+		internal static readonly Dictionary<WeekDate, DateTime> DateTimesByWeekDates = new Dictionary<WeekDate, DateTime>()
 			{
 				{ new WeekDate(1980, 40, 1), new DateTime(1980, 9, 29) },
 
 				// Transition from 2004 to 2005
 				{ new WeekDate(2004, 53, 6), new DateTime(2005, 1, 1) },
 				{ new WeekDate(2004, 53, 7), new DateTime(2005, 1, 2) },
-				
+
 				// Transition from 2005 to 2006
 				{ new WeekDate(2005, 52, 6), new DateTime(2005, 12, 31) },
 				{ new WeekDate(2005, 52, 7), new DateTime(2006, 1, 1) },
 				{ new WeekDate(2006, 1, 1), new DateTime(2006, 1, 2) },
-				
+
 				// Transition from 2006 to 2007
 				{ new WeekDate(2006, 52, 7), new DateTime(2006, 12, 31) },
 				{ new WeekDate(2007, 1, 1), new DateTime(2007, 1, 1) },
-				
+
 				// Transition from 2007 to 2008
 				{ new WeekDate(2007, 52, 7), new DateTime(2007, 12, 30) },
 				{ new WeekDate(2008, 1, 1), new DateTime(2007, 12, 31) },
 				{ new WeekDate(2008, 1, 2), new DateTime(2008, 1, 1) },
-
 				{ new WeekDate(2008, 39, 5), new DateTime(2008, 9, 26) },
 				{ new WeekDate(2008, 39, 6), new DateTime(2008, 9, 27) },
 
@@ -67,16 +74,16 @@ namespace ISOWeekDate
 				{ new WeekDate(2009, 1, 2), new DateTime(2008, 12, 30) },
 				{ new WeekDate(2009, 1, 3), new DateTime(2008, 12, 31) },
 				{ new WeekDate(2009, 1, 4), new DateTime(2009, 1, 1) },
-				
+
 				// Transition from 2009 to 2010
 				{ new WeekDate(2009, 53, 4), new DateTime(2009, 12, 31) },
 				{ new WeekDate(2009, 53, 5), new DateTime(2010, 1, 1) },
 				{ new WeekDate(2009, 53, 6), new DateTime(2010, 1, 2) },
 				{ new WeekDate(2009, 53, 7), new DateTime(2010, 1, 3) },
-
-				{ new WeekDate(2032, 40, 5), new DateTime(2032, 10, 1) }
+				{ new WeekDate(2032, 40, 5), new DateTime(2032, 10, 1) },
 			};
-		internal static readonly Dictionary<int, DayOfWeek> daysOfWeek = new Dictionary<int, DayOfWeek>()
+
+		internal static readonly Dictionary<int, DayOfWeek> DaysOfWeek = new Dictionary<int, DayOfWeek>()
 			{
 				{ 1, DayOfWeek.Monday },
 				{ 2, DayOfWeek.Tuesday },
@@ -84,15 +91,76 @@ namespace ISOWeekDate
 				{ 4, DayOfWeek.Thursday },
 				{ 5, DayOfWeek.Friday },
 				{ 6, DayOfWeek.Saturday },
-				{ 7, DayOfWeek.Sunday }
+				{ 7, DayOfWeek.Sunday },
 			};
 
-		[TestMethod()]
-		[TestCategory("Constructor")]
-		[Priority(1)]
-		public void WeekDateFromDateTime()
+		internal static readonly Dictionary<KeyValuePair<string, string>, WeekDate> WeekDatesByFormats = new Dictionary<KeyValuePair<string, string>, WeekDate>()
 		{
-			foreach (var convertedDate in validConvertedDates)
+			{ new KeyValuePair<string, string>("D", "1980-W40-1"), new WeekDate(1980, 40, 1) },
+			{ new KeyValuePair<string, string>("d", "1980W401"), new WeekDate(1980, 40, 1) },
+			{ new KeyValuePair<string, string>("Y", "1980-W40"), new WeekDate(1980, 40) },
+			{ new KeyValuePair<string, string>("y", "1980W40"), new WeekDate(1980, 40) },
+			{ new KeyValuePair<string, string>("D", "2032-W10-1"), new WeekDate(2032, 10, 1) },
+			{ new KeyValuePair<string, string>("d", "2032W101"), new WeekDate(2032, 10, 1) },
+			{ new KeyValuePair<string, string>("Y", "2032-W10"), new WeekDate(2032, 10) },
+			{ new KeyValuePair<string, string>("y", "2032W10"), new WeekDate(2032, 10) },
+		};
+
+		[TestMethod]
+		[Priority(1)]
+		[TestCategory("Constructor")]
+		public void WeekDateFromComponentsTest()
+		{
+			foreach (WeekDate weekDate in DateTimesByWeekDates.Keys)
+			{
+				Assert.AreEqual(
+					weekDate,
+					new WeekDate(weekDate.Year, weekDate.Week, weekDate.Weekday));
+			}
+		}
+
+		[TestMethod]
+		[Priority(1)]
+		[TestCategory("Constructor")]
+		public void WeekDateFromComponentsOutOfRangeTest()
+		{
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(0, 1, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(10000, 1, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, 0, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, WeekDate.GetWeeksInYear(2000) + 1, 1);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, 1, 0);
+			});
+
+			Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+			{
+				new WeekDate(2000, 1, 8);
+			});
+		}
+
+		[TestMethod]
+		[Priority(1)]
+		[TestCategory("Constructor")]
+		public void WeekDateFromDateTimeTest()
+		{
+			foreach (var convertedDate in DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key,
@@ -101,24 +169,40 @@ namespace ISOWeekDate
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(1)]
-		public void GetWeekCountInYearTest()
+		public void GetWeeksInYearTest()
 		{
-			for (int year = 1; year <= cycleLength; year++)
+			for (int year = 1; year <= CycleLength; year++)
 			{
 				Assert.AreEqual(
-					longYears.Contains(year) ? 53 : 52,
-					WeekDate.GetWeekCountInYear(year),
+					LongYears.Contains(year) ? 53 : 52,
+					WeekDate.GetWeeksInYear(year),
 					$"{year}");
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
+		[Priority(1)]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void GetWeeksInYearLessThanMinimalTest()
+		{
+			WeekDate.GetWeeksInYear(-1);
+		}
+
+		[TestMethod]
+		[Priority(1)]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void GetWeeksInYearMoreThanMaximalTest()
+		{
+			WeekDate.GetWeeksInYear(10000);
+		}
+
+		[TestMethod]
 		[Priority(1)]
 		public void GetWeekdayNumberTest()
 		{
-			foreach (var dayOfWeek in daysOfWeek)
+			foreach (var dayOfWeek in DaysOfWeek)
 			{
 				Assert.AreEqual(
 					dayOfWeek.Key,
@@ -126,23 +210,23 @@ namespace ISOWeekDate
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(1)]
 		public void GetWeekNumberTest()
 		{
-			foreach (var convertedDate in validConvertedDates)
+			foreach (var convertedDate in DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Week,
-					WeekDate.GetWeekNumber(convertedDate.Value));
+					WeekDate.GetWeekOfYear(convertedDate.Value));
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(1)]
 		public void GetYearTest()
 		{
-			foreach (var convertedDate in validConvertedDates)
+			foreach (var convertedDate in DateTimesByWeekDates)
 			{
 				Assert.AreEqual(
 					convertedDate.Key.Year,
@@ -150,55 +234,164 @@ namespace ISOWeekDate
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(1)]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void GetWeekdayNumberArgumentOutOfRangeTest() => WeekDate.GetWeekdayNumber((DayOfWeek)8);
-
-		[TestMethod()]
-		public void GetJanuaryFourthWeekdayTest()
+		public void GetWeekdayNumberArgumentOutOfRangeTest()
 		{
-			var date = new WeekDate(2004, 53, 6);
-			var expectedWeekday = 7;
-
-			Assert.AreEqual(
-				expectedWeekday,
-				WeekDate.GetJanuaryFourthWeekday(date));
-
-			Assert.Inconclusive();
+			WeekDate.GetWeekdayNumber((DayOfWeek)8);
 		}
 
-		[TestMethod()]
-		public void GetOrdinalTest()
+		[TestMethod]
+		[Priority(2)]
+		public void ParseExactFormatSpecifiersTest()
 		{
-			var date = new WeekDate(2008, 39, 6);
-			var expectedOrdinal = 271;
-
-			Assert.AreEqual(
-				expectedOrdinal,
-				date.GetOrdinal());
-
-			Assert.Inconclusive();
-		}
-
-		[TestMethod()]
-		public void GetDateTime()
-		{
-			foreach (var convertedDate in validConvertedDates)
+			foreach (KeyValuePair<KeyValuePair<string, string>, WeekDate> weekDateByFormat in WeekDatesByFormats)
 			{
 				Assert.AreEqual(
-					convertedDate.Value,
-					convertedDate.Key.GetDateTime(),
-					$"WeekDate: {convertedDate.Key.ToString("YYYY-Www-D")}");
+					weekDateByFormat.Value,
+					WeekDate.ParseExact(weekDateByFormat.Key.Value, weekDateByFormat.Key.Key),
+					$"Format: {weekDateByFormat.Key.Key}; String: {weekDateByFormat.Key.Value}");
+
+				Assert.AreEqual(
+					weekDateByFormat.Value,
+					WeekDate.ParseExact(weekDateByFormat.Key.Value, WeekDate.Formats[weekDateByFormat.Key.Key]),
+					$"Format: {WeekDate.Formats[weekDateByFormat.Key.Key]}; String: {weekDateByFormat.Key.Value}");
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(2)]
-		[TestCategory("Comparison")]
+		[ExpectedException(typeof(ArgumentNullException))]
+		public void ParseExactNullSourceStringTest()
+		{
+			WeekDate.ParseExact(null, "d");
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(ArgumentNullException))]
+		public void ParseExactNullFormatStringTest()
+		{
+			WeekDate.ParseExact("2019-W10-1", null);
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(FormatException))]
+		public void ParseExactEmptySourceStringTest()
+		{
+			WeekDate.ParseExact(string.Empty, "d");
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(FormatException))]
+		public void ParseExactEmptyFormatStringTest()
+		{
+			WeekDate.ParseExact("2019-W10-1", string.Empty);
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[ExpectedException(typeof(FormatException))]
+		public void ParseExactInvalidFormatStringTest()
+		{
+			WeekDate.ParseExact("2019-W10-1", DateTimeFormatInfo.InvariantInfo.FullDateTimePattern);
+		}
+
+		// [TestMethod]
+		public void GetOrdinalTest()
+		{
+			throw new NotImplementedException();
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void LessThanTest()
+		{
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex < secondIndex,
+						weekdates[firstIndex] < weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void GreaterThanTest()
+		{
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex > secondIndex,
+						weekdates[firstIndex] > weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void LessThanOrEqualToTest()
+		{
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex <= secondIndex,
+						weekdates[firstIndex] <= weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IComparable")]
+		[TestCategory("Operator")]
+		public void GreaterThanOrEqualToTest()
+		{
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex >= secondIndex,
+						weekdates[firstIndex] >= weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IComparable")]
 		public void CompareToWeekDateTest()
 		{
-			var weekdates = validConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -212,17 +405,20 @@ namespace ISOWeekDate
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(2)]
-		[TestCategory("Comparison")]
-		public void CompareToWeekDateNullTest() => Assert.AreEqual(1, validConvertedDates.Keys.First().CompareTo(null));
+		[TestCategory("IComparable")]
+		public void CompareToWeekDateNullTest()
+		{
+			Assert.AreEqual(1, DateTimesByWeekDates.Keys.First().CompareTo(null));
+		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(2)]
-		[TestCategory("Comparison")]
+		[TestCategory("IComparable")]
 		public void CompareToObjectTest()
 		{
-			var weekdates = validConvertedDates.Keys.ToArray();
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
 
 			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
 			{
@@ -236,15 +432,94 @@ namespace ISOWeekDate
 			}
 		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(2)]
-		[TestCategory("Comparison")]
-		public void CompareToObjectNullTest() => Assert.AreEqual(1, validConvertedDates.Keys.First().CompareTo((object)null));
+		[TestCategory("IComparable")]
+		public void CompareToObjectNullTest()
+		{
+			Assert.AreEqual(1, DateTimesByWeekDates.Keys.First().CompareTo((object)null));
+		}
 
-		[TestMethod()]
+		[TestMethod]
 		[Priority(2)]
-		[TestCategory("Comparison")]
+		[TestCategory("IComparable")]
 		[ExpectedException(typeof(ArgumentException))]
-		public void CompareToObjectArgumentExceptionTest() => validConvertedDates.Keys.First().CompareTo(new object());
+		public void CompareToObjectArgumentExceptionTest()
+		{
+			DateTimesByWeekDates.Keys.First().CompareTo(new object());
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IConvertible")]
+		public void ToDateTimeTest()
+		{
+			foreach (var convertedDate in DateTimesByWeekDates)
+			{
+				Assert.AreEqual(
+					convertedDate.Value,
+					convertedDate.Key.ToDateTime(CultureInfo.InvariantCulture),
+					$"WeekDate: {convertedDate.Key.ToString("YYYY-Www-D")}");
+			}
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IEquatable")]
+		[TestCategory("Operator")]
+		public void EqualToTest()
+		{
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex == secondIndex,
+						weekdates[firstIndex] == weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IEquatable")]
+		[TestCategory("Operator")]
+		public void NotEqualToTest()
+		{
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex != secondIndex,
+						weekdates[firstIndex] != weekdates[secondIndex],
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
+
+		[TestMethod]
+		[Priority(2)]
+		[TestCategory("IEquatable")]
+		public void EqualsTest()
+		{
+			var weekdates = DateTimesByWeekDates.Keys.ToArray();
+
+			for (int firstIndex = 0; firstIndex < weekdates.Length; firstIndex++)
+			{
+				for (int secondIndex = 0; secondIndex < weekdates.Length; secondIndex++)
+				{
+					Assert.AreEqual(
+						firstIndex.Equals(secondIndex),
+						weekdates[firstIndex].Equals(weekdates[secondIndex]),
+						$"{weekdates[firstIndex].ToString()} CompareTo {weekdates[secondIndex].ToString()}");
+				}
+			}
+		}
 	}
 }

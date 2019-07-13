@@ -2,6 +2,24 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
+	  <Authors>Valters Melnalksnis</Authors>
+	  <Description>ISO 8601 week date in .NET standard.</Description>
+	  <Copyright>Valters Melnalksnis</Copyright>
+	  <PackageLicenseUrl>https://github.com/VMelnalksnis/ISOWeekDate.NET/blob/master/LICENSE</PackageLicenseUrl>
+	  <PackageProjectUrl>https://github.com/VMelnalksnis/ISOWeekDate.NET</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/VMelnalksnis/ISOWeekDate.NET.git</RepositoryUrl>
+	  <RepositoryType>Git</RepositoryType>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	  <SignAssembly>false</SignAssembly>
+	  <PackageTags>WeekDate DateTime ISO8601</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.1.118.34620">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>
